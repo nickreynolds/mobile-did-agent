@@ -15,6 +15,17 @@ import { DIDResolutionResult } from '@veramo/core'
 import { VerifiableCredential } from '@veramo/core'
 import { IVerifyResult } from '@veramo/core'
 
+import {NavigationContainer} from '@react-navigation/native';
+import {createNativeStackNavigator} from '@react-navigation/native-stack';
+
+const Stack = createNativeStackNavigator();
+
+import { QueryClient, QueryClientProvider, useQuery } from 'react-query'
+import Home from './pages/home/Home'
+import { ChatProvider } from './providers/ChatProvider'
+import Chats from './pages/chats/Chats'
+const queryClient = new QueryClient()
+
 const App = () => {
   const [identifiers, setIdentifiers] = useState<IIdentifier[]>([])
   const [resolutionResult, setResolutionResult] = useState<DIDResolutionResult | undefined>()
@@ -79,45 +90,22 @@ const App = () => {
     }
   }
 
-  return (
-    <SafeAreaView>
-      <ScrollView>
-        <View style={{ padding: 20 }}>
-          <Text style={{ fontSize: 30, fontWeight: 'bold' }}>Identifiers</Text>
-          <Button onPress={() => createIdentifier()} title={'Create Identifier'} />
-          <View style={{ marginBottom: 50, marginTop: 20 }}>
-            {identifiers && identifiers.length > 0 ? (
-              identifiers.map((id: IIdentifier) => (
-                <Button key={id.did} onPress={() => resolveDID(id.did)} title={id.did} />
-              ))
-            ) : (
-              <Text>No identifiers created yet</Text>
-            )}
-          </View>
-          <Text style={{ fontSize: 30, fontWeight: 'bold' }}>Resolved DID document:</Text>
-          <View style={{ marginBottom: 50, marginTop: 20 }}>
-            {resolutionResult ? (
-              <Text>{JSON.stringify(resolutionResult.didDocument, null, 2)}</Text>
-            ) : (
-              <Text>tap on a DID to resolve it</Text>
-            )}
-          </View>
-        </View>
-        <View style={{ padding: 20 }}>
-          <Button
-            title={'Create Credential'}
-            disabled={!identifiers || identifiers.length === 0}
-            onPress={() => createCredential()}
-          />
-          <Text style={{ fontSize: 10 }}>{JSON.stringify(credential, null, 2)}</Text>
-        </View>
-        <View style={{ padding: 20 }}>
-          <Button title={'Verify Credential'} onPress={() => verifyCredential()} disabled={!credential} />
-          <Text style={{ fontSize: 10 }}>{JSON.stringify(verificationResult, null, 2)}</Text>
-        </View>
-      </ScrollView>
-    </SafeAreaView>
-  )
+  return (    
+    <QueryClientProvider client={queryClient}>
+      <ChatProvider>
+        <NavigationContainer>
+          <Stack.Navigator>
+            <Stack.Screen
+              name="Home"
+              component={Home}
+              options={{title: 'Welcome'}}
+            />
+            <Stack.Screen name="Chats" component={Chats} />
+          </Stack.Navigator>
+        </NavigationContainer>
+      </ChatProvider>
+    </QueryClientProvider>
+  );
 }
 
 export default App

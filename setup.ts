@@ -17,7 +17,7 @@ import { PeerDIDProvider } from '@veramo/did-provider-peer'
 import { KeyManagementSystem, SecretBox } from '@veramo/kms-local'
 
 // Storage plugin using TypeORM to link to a database
-import { Entities, KeyStore, DIDStore, migrations, PrivateKeyStore } from '@veramo/data-store'
+import { Entities, KeyStore, DIDStore, migrations, PrivateKeyStore, DataStore, DataStoreORM } from '@veramo/data-store'
 
 // TypeORM is installed with '@veramo/data-store'
 import { DataSource } from 'typeorm'
@@ -36,6 +36,9 @@ import { getResolver as webDidResolver } from 'web-did-resolver'
 
 // This plugin allows us to issue and verify W3C Verifiable Credentials with JWT proof format
 import { CredentialPlugin, ICredentialIssuer, ICredentialVerifier } from '@veramo/credential-w3c'
+import { CoordinateMediationRecipientMessageHandler, DIDComm, DIDCommHttpTransport, DIDCommMessageHandler, PickupRecipientMessageHandler } from '@veramo/did-comm'
+import { MessageHandler } from '@veramo/message-handler'
+import { SaveMessageHandler } from './utils/saveMessageHandler'
 
 // CONSTANTS
 
@@ -73,10 +76,21 @@ export const agent = createAgent<IDIDManager & IKeyManager & IDataStore & IDataS
           }),
         },
       }),
+      new DIDComm({ transports: [ new DIDCommHttpTransport() ]}),
+      new MessageHandler({
+        messageHandlers: [
+          new DIDCommMessageHandler(),
+          new CoordinateMediationRecipientMessageHandler(),
+          new PickupRecipientMessageHandler(),
+          new SaveMessageHandler()
+        ]
+      }),
       new DIDResolverPlugin({
         ...peerDidResolver(), // and set it up to support `did:peer`
         ...webDidResolver(), // and `did:web`
       }),
       new CredentialPlugin(),
+      new DataStore(dbConnection),
+      new DataStoreORM(dbConnection)
     ],
   })
