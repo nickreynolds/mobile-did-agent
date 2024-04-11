@@ -24,6 +24,7 @@ import { QueryClient, QueryClientProvider, useQuery } from 'react-query'
 import Home from './pages/home/Home'
 import { ChatProvider } from './providers/ChatProvider'
 import Chats from './pages/chats/Chats'
+import Chat from './pages/chats/Chat'
 const queryClient = new QueryClient()
 
 const App = () => {
@@ -51,7 +52,7 @@ const App = () => {
       setIdentifiers(_ids)
 
       // Inspect the id object in your debug tool
-      console.log('_ids:', _ids)
+      // console.log('_ids:', _ids)
     }
 
     getIdentifiers()
@@ -101,6 +102,7 @@ const App = () => {
               options={{title: 'Welcome'}}
             />
             <Stack.Screen name="Chats" component={Chats} />
+            <Stack.Screen name="Chat" component={Chat} />
           </Stack.Navigator>
         </NavigationContainer>
       </ChatProvider>

@@ -20,11 +20,9 @@ interface IsSenderTaggedMessage extends IMessage {
   isSender: boolean
 }
 
-const Chats = () => {
-  // const { token } = useToken()
+const Chats = ( { navigation } ) => {
   const { selectedDid } = useChat()
   // const { threadId } = useParams<{ threadId: string }>()
-  console.log("selectedDid: ", selectedDid)
   const { data: threads, refetch } = useQuery(
     ['threads', { id: agent?.context?.id, selectedDid }],
     async () => {
@@ -59,26 +57,23 @@ const Chats = () => {
     refetch()
   }, [selectedDid, refetch])
 
-  console.log("threads: ", threads)
-
   return (
-        <View style={{ flexGrow: 1 }}>
-
+    <View style={{ flexGrow: 1 }}>
+      <ChatScrollPanel>
         {threads &&
         Object.keys(threads).map((index: any) => {
-            console.log("thread index: ", index)
             return (
-            // <ChatThread
-            //   thread={threads[index]}
-            //   threadId={index}
-            //   key={index}
-            //   threadSelected={false}
-            // />
-            <Text key={index}>index</Text>
+            <ChatThread
+              thread={threads[index]}
+              threadId={index}
+              key={index}
+              threadSelected={false}
+              navigation={navigation}
+            />
             )
         })}
-
-        </View>
+      </ChatScrollPanel>
+    </View>
   )
 }
 

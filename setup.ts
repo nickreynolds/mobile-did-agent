@@ -39,6 +39,10 @@ import { CredentialPlugin, ICredentialIssuer, ICredentialVerifier } from '@veram
 import { CoordinateMediationRecipientMessageHandler, DIDComm, DIDCommHttpTransport, DIDCommMessageHandler, PickupRecipientMessageHandler } from '@veramo/did-comm'
 import { MessageHandler } from '@veramo/message-handler'
 import { SaveMessageHandler } from './utils/saveMessageHandler'
+import { IdentifierProfilePlugin, IIdentifierProfilePlugin } from './utils/IdentifierProfilePlugin'
+import { DIDDiscovery, IDIDDiscovery } from '@veramo/did-discovery'
+import { AliasDiscoveryProvider } from './utils/AliasDiscoveryProvider'
+import { DataStoreDiscoveryProvider } from './utils/did-discovery-provider'
 
 // CONSTANTS
 
@@ -59,7 +63,7 @@ let dbConnection = new DataSource({
   }).initialize()
 
   // Veramo agent setup
-export const agent = createAgent<IDIDManager & IKeyManager & IDataStore & IDataStoreORM & IResolver & ICredentialIssuer & ICredentialVerifier>({
+export const agent = createAgent<IDIDManager & IKeyManager & IDataStore & IDataStoreORM & IResolver & ICredentialIssuer & ICredentialVerifier & IIdentifierProfilePlugin & IDIDDiscovery>({
     plugins: [
       new KeyManager({
         store: new KeyStore(dbConnection),
@@ -91,6 +95,13 @@ export const agent = createAgent<IDIDManager & IKeyManager & IDataStore & IDataS
       }),
       new CredentialPlugin(),
       new DataStore(dbConnection),
-      new DataStoreORM(dbConnection)
+      new DataStoreORM(dbConnection),
+      new IdentifierProfilePlugin(),
+      new DIDDiscovery({
+        providers: [
+          new AliasDiscoveryProvider(),
+          new DataStoreDiscoveryProvider(),
+        ],
+      }),
     ],
   })

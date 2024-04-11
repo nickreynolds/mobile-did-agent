@@ -27,7 +27,7 @@ const Home = ({navigation}) => {
         setIdentifiers(_ids)
   
         // Inspect the id object in your debug tool
-        console.log('_ids:', _ids)
+        // console.log('_ids:', _ids)
       }
   
       getIdentifiers()
@@ -40,9 +40,6 @@ const Home = ({navigation}) => {
     }
 
     const showFtue = identifiers.length === 0 || identifiers[0].services.length === 0
-    console.log("identifiers.length: ", identifiers.length)
-    // console.log("identifiers[0].services: ", identifiers![0].services)
-    console.log("showFtue: ", showFtue)
     if (showFtue) {
         return (<Ftue onCreated={onIDCreated}/>)
     }

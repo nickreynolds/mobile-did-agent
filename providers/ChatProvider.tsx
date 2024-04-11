@@ -32,7 +32,6 @@ const ChatProvider = (props: any) => {
           for (const identifier of managedIdentifiers) {
             for (const service of identifier.services) {
               if (service.type === 'DIDCommMessaging') {
-                console.log("found DID to do stuff with.")
                 pickup(agent, identifier.did, service.serviceEndpoint as string)
               }
             }
